@@ -8,38 +8,68 @@ import java.util.List;
 
 public class FuelRepository {
 
-    private final FuelRecordDao dao;
-    private final LiveData<List<FuelRecord>> allRecords;
-    private final LiveData<FuelRecord> lastRecord;
+    private final VehicleDao vehicleDao;
+    private final FuelRecordDao fuelRecordDao;
 
-    public FuelRepository(Application application) {
-        FuelDatabase db = FuelDatabase.getInstance(application);
-        dao = db.fuelRecordDao();
-        allRecords = dao.getAllByOdometerAsc();
-        lastRecord = dao.getLastRecordLive();
+    public FuelRepository(Application app) {
+        FuelDatabase db = FuelDatabase.getInstance(app);
+        vehicleDao = db.vehicleDao();
+        fuelRecordDao = db.fuelRecordDao();
     }
 
-    public LiveData<List<FuelRecord>> getAllRecords() {
-        return allRecords;
+    public LiveData<List<Vehicle>> getVehicles() {
+        return vehicleDao.getAll();
     }
 
-    public LiveData<FuelRecord> getLastRecord() {
-        return lastRecord;
+    public LiveData<Vehicle> getVehicleById(long id) {
+        return vehicleDao.getById(id);
     }
 
-    public void insert(FuelRecord record) {
-        FuelDatabase.getExecutor().execute(() -> dao.insert(record));
+    public LiveData<List<FuelRecordWithVehicle>> getAllRecordsWithVehicle() {
+        return fuelRecordDao.getAllWithVehicle();
     }
 
-    public void update(FuelRecord record) {
-        FuelDatabase.getExecutor().execute(() -> dao.update(record));
+    public LiveData<List<FuelRecord>> getRecordsByVehicleMileageAsc(long vehicleId) {
+        return fuelRecordDao.getByVehicleMileageAsc(vehicleId);
     }
 
-    public void delete(FuelRecord record) {
-        FuelDatabase.getExecutor().execute(() -> dao.delete(record));
+    public void insertVehicle(Vehicle v) {
+        FuelDatabase.DB_EXECUTOR.execute(() -> vehicleDao.insert(v));
     }
 
-    public void deleteAll() {
-        FuelDatabase.getExecutor().execute(dao::deleteAll);
+    public void updateVehicle(Vehicle v) {
+        FuelDatabase.DB_EXECUTOR.execute(() -> vehicleDao.update(v));
+    }
+
+    public void deleteVehicle(Vehicle v) {
+        FuelDatabase.DB_EXECUTOR.execute(() -> vehicleDao.delete(v));
+    }
+
+    public void insertRecord(FuelRecord r) {
+        FuelDatabase.DB_EXECUTOR.execute(() -> fuelRecordDao.insert(r));
+    }
+
+    public void deleteRecord(FuelRecord r) {
+        FuelDatabase.DB_EXECUTOR.execute(() -> fuelRecordDao.delete(r));
+    }
+
+    public void getLastMileage(long vehicleId, MileageCallback cb) {
+        FuelDatabase.DB_EXECUTOR.execute(() -> {
+            Double last = fuelRecordDao.getLastMileageBlocking(vehicleId);
+            if (last == null) last = 0.0;
+            cb.onResult(last);
+        });
+    }
+
+    public LiveData<List<FuelRecord>> getAllRecordsOrderByVehicleMileageAsc() {
+        return fuelRecordDao.getAllOrderByVehicleAndMileageAsc();
+    }
+
+    public void deleteRecordById(long id) {
+        executor.execute(() -> fuelRecordDao.deleteById(id));
+    }
+
+    public interface MileageCallback {
+        void onResult(double lastMileage);
     }
 }

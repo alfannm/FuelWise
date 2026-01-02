@@ -9,6 +9,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FuelWiseLog">
 
+        <activity android:name=".ui.VehicleManagerActivity" />
+        <activity android:name=".ui.FuelLogActivity" />
         <activity
             android:name=".ui.AddRecordActivity"
             android:exported="false" />

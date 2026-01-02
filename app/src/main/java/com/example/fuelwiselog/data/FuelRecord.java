@@ -1,64 +1,60 @@
 package com.example.fuelwiselog.data;
 
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "fuel_records")
+@Entity(
+        tableName = "fuel_records",
+        foreignKeys = @ForeignKey(
+                entity = Vehicle.class,
+                parentColumns = "id",
+                childColumns = "vehicleId",
+                onDelete = ForeignKey.CASCADE
+        ),
+        indices = {
+                @Index("vehicleId"),
+                @Index(value = {"vehicleId", "mileageKm"})
+        }
+)
 public class FuelRecord {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
 
-    private long timestamp;      // System.currentTimeMillis()
-    private double liters;       // fuel volume in liters
-    private double costRm;       // total cost in RM
-    private long odometerKm;     // odometer reading in km
+    private long vehicleId;
 
-    public FuelRecord(long timestamp, double liters, double costRm, long odometerKm) {
-        this.timestamp = timestamp;
-        this.liters = liters;
+    // ISO date "yyyy-MM-dd" so ordering works lexicographically
+    private String dateIso;
+
+    private double volumeLiters;
+    private double costRm;
+    private double mileageKm;
+
+    public FuelRecord(long vehicleId, String dateIso, double volumeLiters, double costRm, double mileageKm) {
+        this.vehicleId = vehicleId;
+        this.dateIso = dateIso;
+        this.volumeLiters = volumeLiters;
         this.costRm = costRm;
-        this.odometerKm = odometerKm;
+        this.mileageKm = mileageKm;
     }
 
-    // Room needs this setter for autoGenerate primary key
-    public void setId(int id) {
-        this.id = id;
-    }
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
 
-    public int getId() {
-        return id;
-    }
+    public long getVehicleId() { return vehicleId; }
+    public void setVehicleId(long vehicleId) { this.vehicleId = vehicleId; }
 
-    public long getTimestamp() {
-        return timestamp;
-    }
+    public String getDateIso() { return dateIso; }
+    public void setDateIso(String dateIso) { this.dateIso = dateIso; }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
+    public double getVolumeLiters() { return volumeLiters; }
+    public void setVolumeLiters(double volumeLiters) { this.volumeLiters = volumeLiters; }
 
-    public double getLiters() {
-        return liters;
-    }
+    public double getCostRm() { return costRm; }
+    public void setCostRm(double costRm) { this.costRm = costRm; }
 
-    public void setLiters(double liters) {
-        this.liters = liters;
-    }
-
-    public double getCostRm() {
-        return costRm;
-    }
-
-    public void setCostRm(double costRm) {
-        this.costRm = costRm;
-    }
-
-    public long getOdometerKm() {
-        return odometerKm;
-    }
-
-    public void setOdometerKm(long odometerKm) {
-        this.odometerKm = odometerKm;
-    }
+    public double getMileageKm() { return mileageKm; }
+    public void setMileageKm(double mileageKm) { this.mileageKm = mileageKm; }
 }

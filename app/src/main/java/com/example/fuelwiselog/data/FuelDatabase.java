@@ -9,30 +9,24 @@ import androidx.room.RoomDatabase;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {FuelRecord.class}, version = 1, exportSchema = false)
+@Database(entities = {Vehicle.class, FuelRecord.class}, version = 2, exportSchema = false)
 public abstract class FuelDatabase extends RoomDatabase {
 
+    public abstract VehicleDao vehicleDao();
     public abstract FuelRecordDao fuelRecordDao();
+
+    public static final ExecutorService DB_EXECUTOR = Executors.newSingleThreadExecutor();
 
     private static volatile FuelDatabase INSTANCE;
 
-    // A small thread pool for DB operations
-    private static final ExecutorService databaseWriteExecutor =
-            Executors.newFixedThreadPool(4);
-
-    public static ExecutorService getExecutor() {
-        return databaseWriteExecutor;
-    }
-
-    public static FuelDatabase getInstance(final Context context) {
+    public static FuelDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (FuelDatabase.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(
-                                    context.getApplicationContext(),
-                                    FuelDatabase.class,
-                                    "fuel_db"
-                            )
+                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                                    FuelDatabase.class, "fuelwise_db")
+                            // for student project/dev: easiest when schema changes
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

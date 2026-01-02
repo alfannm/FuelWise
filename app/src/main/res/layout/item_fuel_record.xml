@@ -1,47 +1,240 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardUseCompatPadding="true">
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="6dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:background="@drawable/bg_glass_card"
+        android:orientation="vertical">
+
+        <!-- Header row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardColor"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:cardCornerRadius="12dp"
+                android:layout_marginEnd="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="⛽"
+                    android:textSize="16sp"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvVehicleName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vehicle"
+                    android:textStyle="bold"
+                    android:textColor="#111111"/>
+
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2026-01-01"
+                    android:textColor="#666666"
+                    android:textSize="13sp"/>
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDelete"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:text="🗑"
+                android:minWidth="0dp"
+                android:insetLeft="0dp"
+                android:insetRight="0dp"
+                android:padding="0dp"/>
+        </LinearLayout>
+
+        <!-- Details -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#221A73E8"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Volume"
+                    android:textSize="12sp"
+                    android:textColor="#356AE6"/>
+
+                <TextView
+                    android:id="@+id/tvVolume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0.0L"
+                    android:textStyle="bold"
+                    android:textColor="#111111"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="#2222C55E"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cost"
+                    android:textSize="12sp"
+                    android:textColor="#1B8E4B"/>
+
+                <TextView
+                    android:id="@+id/tvCost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RM0.00"
+                    android:textStyle="bold"
+                    android:textColor="#111111"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="#22B67CFF"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mileage"
+                    android:textSize="12sp"
+                    android:textColor="#6B4EFF"/>
+
+                <TextView
+                    android:id="@+id/tvMileage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0km"
+                    android:textStyle="bold"
+                    android:textColor="#111111"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Efficiency -->
+        <LinearLayout
+            android:id="@+id/layoutEfficiency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvSince"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Since last fill-up (0 km)"
+                android:textColor="#666666"
+                android:textSize="12sp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="#22FFB74D"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RM per km"
+                        android:textSize="12sp"
+                        android:textColor="#9C6A00"/>
+
+                    <TextView
+                        android:id="@+id/tvRmPerKm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RM 0.00"
+                        android:textStyle="bold"
+                        android:textColor="#111111"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:background="#2200BCD4"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="L per 100 km"
+                        android:textSize="12sp"
+                        android:textColor="#007C8B"/>
+
+                    <TextView
+                        android:id="@+id/tvLPer100"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0.00 L"
+                        android:textStyle="bold"
+                        android:textColor="#111111"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/tvDate"
+            android:id="@+id/tvNoEfficiency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="12 Oct 2026, 09:12"/>
-
-        <TextView
-            android:id="@+id/tvMain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="6dp"
-            android:text="Odo 12345 km • 40.0 L • RM 100.00"/>
-
-        <TextView
-            android:id="@+id/tvMetrics"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="6dp"
-            android:text="Distance 520 km • 7.69 L/100km • 0.19 RM/km"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="6dp"
-            android:text="Long-press to delete"
+            android:text="First record or no previous data for comparison"
+            android:textColor="#888888"
             android:textSize="12sp"
-            android:alpha="0.7"/>
+            android:layout_marginTop="12dp"
+            android:visibility="gone"/>
 
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

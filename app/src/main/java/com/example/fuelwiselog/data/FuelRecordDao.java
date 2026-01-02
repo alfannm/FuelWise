@@ -1,11 +1,7 @@
 package com.example.fuelwiselog.data;
 
 import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Update;
+import androidx.room.*;
 
 import java.util.List;
 
@@ -15,19 +11,28 @@ public interface FuelRecordDao {
     @Insert
     long insert(FuelRecord record);
 
-    @Update
-    void update(FuelRecord record);
-
     @Delete
     void delete(FuelRecord record);
 
-    @Query("DELETE FROM fuel_records")
-    void deleteAll();
+    @Transaction
+    @Query("SELECT * FROM fuel_records ORDER BY dateIso DESC, id DESC")
+    LiveData<List<FuelRecordWithVehicle>> getAllWithVehicle();
 
-    // Oldest -> newest (odometer increases). Best for computing distance between fill-ups.
-    @Query("SELECT * FROM fuel_records ORDER BY odometerKm ASC")
-    LiveData<List<FuelRecord>> getAllByOdometerAsc();
+    @Query("SELECT * FROM fuel_records WHERE vehicleId = :vehicleId ORDER BY mileageKm ASC")
+    LiveData<List<FuelRecord>> getByVehicleMileageAsc(long vehicleId);
 
-    @Query("SELECT * FROM fuel_records ORDER BY odometerKm DESC LIMIT 1")
-    LiveData<FuelRecord> getLastRecordLive();
+    @Query("SELECT * FROM fuel_records WHERE vehicleId = :vehicleId ORDER BY mileageKm ASC")
+    List<FuelRecord> getByVehicleMileageAscBlocking(long vehicleId);
+
+    @Query("SELECT mileageKm FROM fuel_records WHERE vehicleId = :vehicleId ORDER BY mileageKm DESC LIMIT 1")
+    Double getLastMileageBlocking(long vehicleId);
+
+    // For efficiency calculations (previous record per vehicle)
+    @Query("SELECT * FROM fuel_records ORDER BY vehicleId ASC, mileageKm ASC")
+    LiveData<List<FuelRecord>> getAllOrderByVehicleAndMileageAsc();
+
+    // For delete from Fuel Log adapter (delete by id only)
+    @Query("DELETE FROM fuel_records WHERE id = :id")
+    void deleteById(long id);
+
 }

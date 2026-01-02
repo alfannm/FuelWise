@@ -1,107 +1,187 @@
 package com.example.fuelwiselog.ui;
 
+import android.app.DatePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.fuelwiselog.R;
-import com.example.fuelwiselog.data.FuelRecord;
+import com.example.fuelwiselog.util.Prefs;
+import com.example.fuelwiselog.data.Vehicle;
 import com.example.fuelwiselog.databinding.ActivityAddRecordBinding;
 
-import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class AddRecordActivity extends AppCompatActivity {
 
     private ActivityAddRecordBinding binding;
     private FuelViewModel viewModel;
 
-    private Long lastOdoKm = null;
+    private final SimpleDateFormat iso = new SimpleDateFormat("yyyy-MM-dd");
 
-    private final DecimalFormat df0 = new DecimalFormat("0");
+    private List<Vehicle> vehicles = new ArrayList<>();
+    private long selectedVehicleId = -1;
+    private long lastMileage = -1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityAddRecordBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         viewModel = new ViewModelProvider(this).get(FuelViewModel.class);
 
-        // Toolbar back
-        binding.toolbar.setNavigationOnClickListener(v -> finish());
+        binding.btnBack.setOnClickListener(v -> finish());
 
-        // Observe last record to enforce increasing odometer
-        viewModel.getLastRecord().observe(this, last -> {
-            if (last == null) {
-                lastOdoKm = null;
-                binding.tvLastOdo.setText("Last odometer: — km");
+        // Date default = today
+        Calendar cal = Calendar.getInstance();
+        binding.etDate.setText(iso.format(cal.getTime()));
+
+        binding.etDate.setOnClickListener(v -> {
+            Calendar c = Calendar.getInstance();
+            new DatePickerDialog(
+                    AddRecordActivity.this,
+                    (view, year, month, dayOfMonth) -> {
+                        Calendar picked = Calendar.getInstance();
+                        picked.set(year, month, dayOfMonth);
+                        binding.etDate.setText(iso.format(picked.getTime()));
+                    },
+                    c.get(Calendar.YEAR),
+                    c.get(Calendar.MONTH),
+                    c.get(Calendar.DAY_OF_MONTH)
+            ).show();
+        });
+
+        viewModel.getVehicles().observe(this, list -> {
+            vehicles = list;
+
+            if (vehicles.isEmpty()) {
+                Toast.makeText(this, "No vehicles. Add a vehicle first.", Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+
+            setupVehicleDropdown();
+
+            long prefId = Prefs.getSelectedVehicleId(this);
+            if (prefId > 0) {
+                setSelectedVehicle(prefId);
             } else {
-                lastOdoKm = last.getOdometerKm();
-                binding.tvLastOdo.setText(getString(R.string.last_odometer, df0.format(lastOdoKm)));
+                setSelectedVehicle(vehicles.get(0).getId());
             }
         });
 
-        binding.btnSave.setOnClickListener(v -> onSave());
+        binding.btnSave.setOnClickListener(v -> saveRecord());
     }
 
-    private void onSave() {
+    private void setupVehicleDropdown() {
+        List<String> labels = new ArrayList<>();
+        for (Vehicle v : vehicles) labels.add(v.getName() + " (" + v.getType() + ")");
+
+        ArrayAdapter<String> a = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, labels);
+        binding.actVehicle.setAdapter(a);
+
+        binding.actVehicle.setOnItemClickListener((parent, view, position, id) -> {
+            Vehicle v = vehicles.get(position);
+            setSelectedVehicle(v.getId());
+        });
+    }
+
+    private void setSelectedVehicle(long vehicleId) {
+        selectedVehicleId = vehicleId;
+
+        Vehicle v = null;
+        for (Vehicle vv : vehicles) if (vv.getId() == vehicleId) { v = vv; break; }
+
+        if (v != null) {
+            binding.layoutVehiclePreview.setVisibility(android.view.View.VISIBLE);
+            binding.tvPreviewName.setText(v.getName());
+            binding.tvPreviewType.setText(v.getType());
+            try {
+                binding.cardPreviewColor.setCardBackgroundColor(Color.parseColor(v.getColorHex()));
+            } catch (Exception ignored) {}
+
+            // update dropdown text to match
+            binding.actVehicle.setText(v.getName() + " (" + v.getType() + ")", false);
+        }
+
+        // load last mileage for this vehicle
+        viewModel.getLastMileage(vehicleId).observe(this, last -> {
+            if (last == null) {
+                lastMileage = -1;
+                binding.tvLastMileage.setText("Last recorded: — km");
+            } else {
+                lastMileage = last;
+                binding.tvLastMileage.setText("Last recorded: " + lastMileage + " km");
+            }
+        });
+    }
+
+    private void saveRecord() {
         clearErrors();
 
-        Double liters = parseDouble(binding.etLiters.getText() == null ? null : binding.etLiters.getText().toString());
-        Double cost = parseDouble(binding.etCost.getText() == null ? null : binding.etCost.getText().toString());
-        Long odometer = parseLong(binding.etOdometer.getText() == null ? null : binding.etOdometer.getText().toString());
+        String dateIso = binding.etDate.getText() == null ? "" : binding.etDate.getText().toString().trim();
+        Double liters = parseDouble(binding.etLiters.getText());
+        Double cost = parseDouble(binding.etCost.getText());
+        Long mileage = parseLong(binding.etMileage.getText());
 
         boolean ok = true;
 
-        if (liters == null) {
-            binding.tilLiters.setError(getString(R.string.invalid_number));
-            ok = false;
-        } else if (liters <= 0) {
-            binding.tilLiters.setError(getString(R.string.must_be_positive));
+        if (selectedVehicleId <= 0) {
+            binding.tilVehicle.setError("Select a vehicle");
             ok = false;
         }
-
-        if (cost == null) {
-            binding.tilCost.setError(getString(R.string.invalid_number));
-            ok = false;
-        } else if (cost <= 0) {
-            binding.tilCost.setError(getString(R.string.must_be_positive));
+        if (dateIso.isEmpty()) {
+            binding.tilDate.setError("Pick a date");
             ok = false;
         }
-
-        if (odometer == null) {
-            binding.tilOdometer.setError(getString(R.string.invalid_number));
+        if (liters == null || liters <= 0) {
+            binding.tilLiters.setError("Invalid liters");
             ok = false;
-        } else if (odometer <= 0) {
-            binding.tilOdometer.setError(getString(R.string.must_be_positive));
+        }
+        if (cost == null || cost <= 0) {
+            binding.tilCost.setError("Invalid cost");
             ok = false;
-        } else if (lastOdoKm != null && odometer <= lastOdoKm) {
-            binding.tilOdometer.setError(getString(R.string.odometer_must_increase));
+        }
+        if (mileage == null || mileage <= 0) {
+            binding.tilMileage.setError("Invalid mileage");
+            ok = false;
+        } else if (lastMileage > 0 && mileage <= lastMileage) {
+            binding.tilMileage.setError("Mileage must be greater than " + lastMileage);
             ok = false;
         }
 
         if (!ok) return;
 
-        viewModel.insert(liters, cost, odometer);
+        // Save selected vehicle for Home / Fuel Log
+        Prefs.setSelectedVehicleId(this, selectedVehicleId);
 
-        Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
+        // Insert
+        viewModel.insertFuelRecord(selectedVehicleId, dateIso, liters, cost, mileage);
+
+        Toast.makeText(this, "Record added", Toast.LENGTH_SHORT).show();
         finish();
     }
 
     private void clearErrors() {
+        binding.tilVehicle.setError(null);
+        binding.tilDate.setError(null);
         binding.tilLiters.setError(null);
         binding.tilCost.setError(null);
-        binding.tilOdometer.setError(null);
+        binding.tilMileage.setError(null);
     }
 
-    private Double parseDouble(String s) {
+    private Double parseDouble(CharSequence cs) {
         try {
-            if (s == null) return null;
-            s = s.trim();
+            if (cs == null) return null;
+            String s = cs.toString().trim();
             if (s.isEmpty()) return null;
             return Double.parseDouble(s);
         } catch (Exception e) {
@@ -109,10 +189,10 @@ public class AddRecordActivity extends AppCompatActivity {
         }
     }
 
-    private Long parseLong(String s) {
+    private Long parseLong(CharSequence cs) {
         try {
-            if (s == null) return null;
-            s = s.trim();
+            if (cs == null) return null;
+            String s = cs.toString().trim();
             if (s.isEmpty()) return null;
             return Long.parseLong(s);
         } catch (Exception e) {
