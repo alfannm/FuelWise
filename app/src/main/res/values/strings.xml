@@ -11,6 +11,8 @@
     <string name="delete_all_message">Delete all fuel records? This cannot be undone.</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="select">Select</string>
 
     <string name="add_fillup">Add fuel fill-up</string>
     <string name="last_odometer">Last odometer: %1$s km</string>

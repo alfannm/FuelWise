@@ -89,7 +89,11 @@
             android:insetRight="0dp"
             android:minWidth="0dp"
             android:padding="0dp"
-            android:text="✏️" />
+            android:contentDescription="@string/edit"
+            app:icon="@drawable/baseline_edit_24"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconTint="@color/icon_edit" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSelect"
@@ -101,20 +105,29 @@
             android:insetRight="0dp"
             android:minWidth="0dp"
             android:padding="0dp"
-            android:text="✔️" />
+            android:contentDescription="@string/select"
+            app:icon="@drawable/ic_check_24"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconTint="@color/icon_check" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDelete"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:text="🗑️"
             android:minWidth="0dp"
             android:layout_marginStart="6dp"
             android:insetLeft="0dp"
             android:insetRight="0dp"
-            android:padding="0dp"/>
+            android:padding="0dp"
+            android:contentDescription="@string/delete"
+            app:icon="@drawable/ic_delete_24"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconTint="@color/icon_delete" />
 
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
+

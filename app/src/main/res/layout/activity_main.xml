@@ -291,13 +291,13 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"/>
                 </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="→"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"/>
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:alpha="0.75"
+                    android:contentDescription="@null"
+                    app:srcCompat="@drawable/ic_arrow_right_24"
+                    app:tint="?attr/colorOnSurface"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -347,13 +347,13 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"/>
                 </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="→"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"/>
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:alpha="0.75"
+                    android:contentDescription="@null"
+                    app:srcCompat="@drawable/ic_arrow_right_24"
+                    app:tint="?attr/colorOnSurface"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -403,13 +403,13 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"/>
                 </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="→"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"/>
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:alpha="0.75"
+                    android:contentDescription="@null"
+                    app:srcCompat="@drawable/ic_arrow_right_24"
+                    app:tint="?attr/colorOnSurface"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -431,3 +431,7 @@
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
+
+
+
+

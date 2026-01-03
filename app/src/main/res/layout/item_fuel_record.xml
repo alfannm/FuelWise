@@ -62,11 +62,14 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:text="🗑"
                 android:minWidth="0dp"
                 android:insetLeft="0dp"
                 android:insetRight="0dp"
-                android:padding="0dp"/>
+                android:padding="0dp"
+                app:icon="@drawable/ic_delete_24"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@color/icon_delete"/>
         </LinearLayout>
 
         <!-- Details -->

@@ -10,4 +10,7 @@
     <color name="l_per_100">#0091EA</color>
     <color name="active_text">#00C853</color>
     <color name="active_background">#3300C853</color>
+    <color name="icon_edit">#5C8BD6</color>
+    <color name="icon_check">#5FAF75</color>
+    <color name="icon_delete">#D46A6A</color>
 </resources>
