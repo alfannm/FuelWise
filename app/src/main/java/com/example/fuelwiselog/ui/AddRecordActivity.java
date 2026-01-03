@@ -28,7 +28,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
     private List<Vehicle> vehicles = new ArrayList<>();
     private long selectedVehicleId = -1;
-    private long lastMileage = -1;
+    private double lastMileage = -1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -119,7 +119,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 binding.tvLastMileage.setText("Last recorded: — km");
             } else {
                 lastMileage = last;
-                binding.tvLastMileage.setText("Last recorded: " + lastMileage + " km");
+                binding.tvLastMileage.setText("Last recorded: " + ((long) lastMileage) + " km");
             }
         });
     }
@@ -154,7 +154,7 @@ public class AddRecordActivity extends AppCompatActivity {
             binding.tilMileage.setError("Invalid mileage");
             ok = false;
         } else if (lastMileage > 0 && mileage <= lastMileage) {
-            binding.tilMileage.setError("Mileage must be greater than " + lastMileage);
+            binding.tilMileage.setError("Mileage must be greater than " + ((long) lastMileage));
             ok = false;
         }
 

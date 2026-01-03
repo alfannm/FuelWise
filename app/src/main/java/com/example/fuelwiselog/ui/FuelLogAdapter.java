@@ -21,6 +21,7 @@ public class FuelLogAdapter extends ListAdapter<FuelLogItem, FuelLogAdapter.VH> 
 
     private final Actions actions;
     private final DecimalFormat df2 = new DecimalFormat("0.00");
+    private final DecimalFormat df0 = new DecimalFormat("0");
 
     public FuelLogAdapter(Actions actions) {
         super(DIFF);
@@ -61,7 +62,7 @@ public class FuelLogAdapter extends ListAdapter<FuelLogItem, FuelLogAdapter.VH> 
 
             b.tvVolume.setText(df2.format(item.liters) + "L");
             b.tvCost.setText("RM" + df2.format(item.costRm));
-            b.tvMileage.setText(item.mileageKm + "km");
+            b.tvMileage.setText(df0.format(item.mileageKm) + "km");
 
             b.btnDelete.setOnClickListener(v -> actions.onDelete(item.recordId));
 
@@ -69,7 +70,7 @@ public class FuelLogAdapter extends ListAdapter<FuelLogItem, FuelLogAdapter.VH> 
                 b.layoutEfficiency.setVisibility(android.view.View.VISIBLE);
                 b.tvNoEfficiency.setVisibility(android.view.View.GONE);
 
-                b.tvSince.setText("Since last fill-up (" + item.distanceKm + " km)");
+                b.tvSince.setText("Since last fill-up (" + df0.format(item.distanceKm) + " km)");
                 b.tvRmPerKm.setText("RM " + df2.format(item.rmPerKm));
                 b.tvLPer100.setText(df2.format(item.litersPer100Km) + " L");
             } else {

@@ -9,10 +9,10 @@ public class FuelLogItem {
     public String dateIso;
     public double liters;
     public double costRm;
-    public long mileageKm;
+    public double mileageKm;
 
     public boolean hasEfficiency;
-    public long distanceKm;
+    public double distanceKm;
     public double rmPerKm;
     public double litersPer100Km;
 }

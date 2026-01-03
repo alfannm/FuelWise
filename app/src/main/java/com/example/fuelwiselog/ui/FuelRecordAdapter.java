@@ -13,10 +13,11 @@ import com.example.fuelwiselog.data.FuelRecord;
 import com.example.fuelwiselog.databinding.ItemFuelRecordBinding;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
+/**
+ * Legacy adapter (safe to keep even if unused). Updated to match the current FuelRecord fields:
+ * dateIso, mileageKm, volumeLiters, costRm.
+ */
 public class FuelRecordAdapter extends ListAdapter<FuelRecordDisplay, FuelRecordAdapter.RecordVH> {
 
     public interface OnRecordLongClickListener {
@@ -30,7 +31,7 @@ public class FuelRecordAdapter extends ListAdapter<FuelRecordDisplay, FuelRecord
     }
 
     private static final DiffUtil.ItemCallback<FuelRecordDisplay> DIFF_CALLBACK =
-            new DiffUtil.ItemCallback<FuelRecordDisplay>() {
+            new DiffUtil.ItemCallback<>() {
                 @Override
                 public boolean areItemsTheSame(@NonNull FuelRecordDisplay oldItem, @NonNull FuelRecordDisplay newItem) {
                     return oldItem.record.getId() == newItem.record.getId();
@@ -41,17 +42,21 @@ public class FuelRecordAdapter extends ListAdapter<FuelRecordDisplay, FuelRecord
                     FuelRecord o = oldItem.record;
                     FuelRecord n = newItem.record;
 
-                    return o.getTimestamp() == n.getTimestamp()
-                            && o.getOdometerKm() == n.getOdometerKm()
-                            && Double.compare(o.getLiters(), n.getLiters()) == 0
+                    return safeEq(o.getDateIso(), n.getDateIso())
+                            && Double.compare(o.getMileageKm(), n.getMileageKm()) == 0
+                            && Double.compare(o.getVolumeLiters(), n.getVolumeLiters()) == 0
                             && Double.compare(o.getCostRm(), n.getCostRm()) == 0;
+                }
+
+                private boolean safeEq(String a, String b) {
+                    if (a == null && b == null) return true;
+                    if (a == null) return false;
+                    return a.equals(b);
                 }
             };
 
-    private final SimpleDateFormat dateFormat =
-            new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
-
     private final DecimalFormat df2 = new DecimalFormat("0.00");
+    private final DecimalFormat df0 = new DecimalFormat("0");
 
     public FuelRecordAdapter() {
         super(DIFF_CALLBACK);
@@ -84,22 +89,21 @@ public class FuelRecordAdapter extends ListAdapter<FuelRecordDisplay, FuelRecord
         void bind(FuelRecordDisplay item) {
             FuelRecord r = item.record;
 
-            b.tvDate.setText(dateFormat.format(new Date(r.getTimestamp())));
+            b.tvDate.setText(r.getDateIso() == null ? "" : r.getDateIso());
+            b.tvMileage.setText(df0.format(r.getMileageKm()) + "km");
+            b.tvVolume.setText(df2.format(r.getVolumeLiters()) + "L");
+            b.tvCost.setText("RM" + df2.format(r.getCostRm()));
 
-            String main = "Odo " + r.getOdometerKm() + " km • "
-                    + df2.format(r.getLiters()) + " L • "
-                    + "RM " + df2.format(r.getCostRm());
-            b.tvMain.setText(main);
-
-            String metrics;
             if (item.distanceKm == null) {
-                metrics = "Distance — • L/100km — • RM/km —";
+                b.layoutEfficiency.setVisibility(View.GONE);
+                b.tvNoEfficiency.setVisibility(View.VISIBLE);
             } else {
-                metrics = "Distance " + item.distanceKm + " km • "
-                        + df2.format(item.litersPer100Km) + " L/100km • "
-                        + df2.format(item.rmPerKm) + " RM/km";
+                b.layoutEfficiency.setVisibility(View.VISIBLE);
+                b.tvNoEfficiency.setVisibility(View.GONE);
+                b.tvSince.setText("Since last fill-up (" + df0.format(item.distanceKm) + " km)");
+                b.tvLPer100.setText(df2.format(item.litersPer100Km) + " L");
+                b.tvRmPerKm.setText("RM " + df2.format(item.rmPerKm));
             }
-            b.tvMetrics.setText(metrics);
 
             View root = b.getRoot();
             root.setOnLongClickListener(v -> {

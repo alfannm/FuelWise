@@ -21,7 +21,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private FuelWiseViewModel vm;
+    private FuelViewModel vm;
 
     private final DecimalFormat df2 = new DecimalFormat("0.00");
 
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        vm = new ViewModelProvider(this).get(FuelWiseViewModel.class);
+        vm = new ViewModelProvider(this).get(FuelViewModel.class);
 
         setupThemeButtons();
 

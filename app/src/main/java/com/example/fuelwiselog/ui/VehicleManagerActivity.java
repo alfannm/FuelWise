@@ -180,7 +180,7 @@ public class VehicleManagerActivity extends AppCompatActivity {
         String colorHex = checkedIndex >= 0 && checkedIndex < vehicleColors.size() ? vehicleColors.get(checkedIndex) : vehicleColors.get(0);
 
         if (editing == null) {
-            Vehicle v = new Vehicle(name, type, plate.isEmpty() ? null : plate, colorHex);
+            Vehicle v = new Vehicle(name, type, colorHex, plate.isEmpty() ? null : plate);
             viewModel.insertVehicle(v);
             Toast.makeText(this, "Vehicle added", Toast.LENGTH_SHORT).show();
         } else {

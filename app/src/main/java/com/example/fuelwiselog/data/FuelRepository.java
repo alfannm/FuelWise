@@ -6,6 +6,10 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
+/**
+ * Repository for Vehicles + Fuel Records.
+ * All writes run on {@link FuelDatabase#DB_EXECUTOR}.
+ */
 public class FuelRepository {
 
     private final VehicleDao vehicleDao;
@@ -17,20 +21,13 @@ public class FuelRepository {
         fuelRecordDao = db.fuelRecordDao();
     }
 
+    // ---------------- Vehicles ----------------
     public LiveData<List<Vehicle>> getVehicles() {
         return vehicleDao.getAll();
     }
 
     public LiveData<Vehicle> getVehicleById(long id) {
         return vehicleDao.getById(id);
-    }
-
-    public LiveData<List<FuelRecordWithVehicle>> getAllRecordsWithVehicle() {
-        return fuelRecordDao.getAllWithVehicle();
-    }
-
-    public LiveData<List<FuelRecord>> getRecordsByVehicleMileageAsc(long vehicleId) {
-        return fuelRecordDao.getByVehicleMileageAsc(vehicleId);
     }
 
     public void insertVehicle(Vehicle v) {
@@ -45,31 +42,34 @@ public class FuelRepository {
         FuelDatabase.DB_EXECUTOR.execute(() -> vehicleDao.delete(v));
     }
 
-    public void insertRecord(FuelRecord r) {
-        FuelDatabase.DB_EXECUTOR.execute(() -> fuelRecordDao.insert(r));
+    // ---------------- Fuel Records ----------------
+    public LiveData<List<FuelRecord>> getRecordsByVehicleMileageAsc(long vehicleId) {
+        return fuelRecordDao.getByVehicleMileageAsc(vehicleId);
     }
 
-    public void deleteRecord(FuelRecord r) {
-        FuelDatabase.DB_EXECUTOR.execute(() -> fuelRecordDao.delete(r));
-    }
-
-    public void getLastMileage(long vehicleId, MileageCallback cb) {
-        FuelDatabase.DB_EXECUTOR.execute(() -> {
-            Double last = fuelRecordDao.getLastMileageBlocking(vehicleId);
-            if (last == null) last = 0.0;
-            cb.onResult(last);
-        });
+    public LiveData<Double> getLastMileage(long vehicleId) {
+        return fuelRecordDao.getLastMileage(vehicleId);
     }
 
     public LiveData<List<FuelRecord>> getAllRecordsOrderByVehicleMileageAsc() {
         return fuelRecordDao.getAllOrderByVehicleAndMileageAsc();
     }
 
-    public void deleteRecordById(long id) {
-        executor.execute(() -> fuelRecordDao.deleteById(id));
+    public LiveData<List<FuelRecordWithVehicle>> getAllRecordsWithVehicle() {
+        return fuelRecordDao.getAllWithVehicle();
     }
 
-    public interface MileageCallback {
-        void onResult(double lastMileage);
+    /** Alias used by FuelViewModel */
+    public void insert(FuelRecord r) {
+        FuelDatabase.DB_EXECUTOR.execute(() -> fuelRecordDao.insert(r));
+    }
+
+    /** Alias used by FuelViewModel */
+    public void delete(FuelRecord r) {
+        FuelDatabase.DB_EXECUTOR.execute(() -> fuelRecordDao.delete(r));
+    }
+
+    public void deleteFuelRecordById(long id) {
+        FuelDatabase.DB_EXECUTOR.execute(() -> fuelRecordDao.deleteById(id));
     }
 }

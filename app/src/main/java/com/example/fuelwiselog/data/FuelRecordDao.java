@@ -27,6 +27,10 @@ public interface FuelRecordDao {
     @Query("SELECT mileageKm FROM fuel_records WHERE vehicleId = :vehicleId ORDER BY mileageKm DESC LIMIT 1")
     Double getLastMileageBlocking(long vehicleId);
 
+    // LiveData version for UI observation (Add Record validation)
+    @Query("SELECT mileageKm FROM fuel_records WHERE vehicleId = :vehicleId ORDER BY mileageKm DESC LIMIT 1")
+    LiveData<Double> getLastMileage(long vehicleId);
+
     // For efficiency calculations (previous record per vehicle)
     @Query("SELECT * FROM fuel_records ORDER BY vehicleId ASC, mileageKm ASC")
     LiveData<List<FuelRecord>> getAllOrderByVehicleAndMileageAsc();

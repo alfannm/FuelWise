@@ -107,7 +107,7 @@ public class FuelLogActivity extends AppCompatActivity {
             item.recordId = r.getId();
             item.vehicleId = r.getVehicleId();
             item.dateIso = r.getDateIso();
-            item.liters = r.getLiters();
+            item.liters = r.getVolumeLiters();
             item.costRm = r.getCostRm();
             item.mileageKm = r.getMileageKm();
 
@@ -123,12 +123,12 @@ public class FuelLogActivity extends AppCompatActivity {
             item.hasEfficiency = false;
 
             if (prev != null && prevVehicleId == r.getVehicleId()) {
-                long distance = r.getMileageKm() - prev.getMileageKm();
+                double distance = r.getMileageKm() - prev.getMileageKm();
                 if (distance > 0) {
                     item.hasEfficiency = true;
                     item.distanceKm = distance;
-                    item.rmPerKm = r.getCostRm() / (double) distance;
-                    item.litersPer100Km = (r.getLiters() / (double) distance) * 100.0;
+                    item.rmPerKm = r.getCostRm() / distance;
+                    item.litersPer100Km = (r.getVolumeLiters() / distance) * 100.0;
                 }
             }
 
@@ -187,11 +187,11 @@ public class FuelLogActivity extends AppCompatActivity {
             FuelRecord cur = list.get(i);
             FuelRecord prev = list.get(i - 1);
 
-            long dist = cur.getMileageKm() - prev.getMileageKm();
+            double dist = cur.getMileageKm() - prev.getMileageKm();
             if (dist <= 0) continue;
 
-            double rmPerKm = cur.getCostRm() / (double) dist;
-            double lPer100 = (cur.getLiters() / (double) dist) * 100.0;
+            double rmPerKm = cur.getCostRm() / dist;
+            double lPer100 = (cur.getVolumeLiters() / dist) * 100.0;
 
             sumRmPerKm += rmPerKm;
             sumLPer100 += lPer100;

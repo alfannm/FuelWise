@@ -39,10 +39,10 @@ public class FuelSummary {
 
         for (int i = 1; i < records.size(); i++) {
             FuelRecord cur = records.get(i);
-            long d = cur.getOdometerKm() - prev.getOdometerKm();
+            double d = cur.getMileageKm() - prev.getMileageKm();
             if (d > 0) {
-                totalD += d;
-                totalL += cur.getLiters();
+                totalD += Math.round(d);
+                totalL += cur.getVolumeLiters();
                 totalC += cur.getCostRm();
             }
             prev = cur;

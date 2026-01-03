@@ -5,8 +5,6 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Transformations;
-
 import com.example.fuelwiselog.data.FuelRecord;
 import com.example.fuelwiselog.data.FuelRepository;
 import com.example.fuelwiselog.data.Vehicle;
@@ -17,44 +15,21 @@ public class FuelViewModel extends AndroidViewModel {
 
     private final FuelRepository repository;
 
-    // Existing (your current pipeline)
-    private final LiveData<List<FuelRecordDisplay>> displayRecords;
-    private final LiveData<FuelSummary> summary;
-
-    // New (needed for Vehicles + Fuel Log)
+    // Vehicles
     private final LiveData<List<Vehicle>> vehicles;
+
+    // Fuel Log (needs mileage-ascending list across all vehicles)
     private final LiveData<List<FuelRecord>> allRecordsOrderByVehicleMileageAsc;
 
     public FuelViewModel(@NonNull Application application) {
         super(application);
         repository = new FuelRepository(application);
 
-        // Existing (keep)
-        displayRecords = Transformations.map(
-                repository.getAllRecords(), // your repo already has this
-                records -> FuelRecordDisplay.build(records, true)
-        );
-
-        summary = Transformations.map(
-                repository.getAllRecords(),
-                FuelSummary::from
-        );
-
-        // New (must exist in repository)
         vehicles = repository.getVehicles();
         allRecordsOrderByVehicleMileageAsc = repository.getAllRecordsOrderByVehicleMileageAsc();
     }
 
-    // -----------------------------
-    // Existing getters (keep)
-    // -----------------------------
-    public LiveData<List<FuelRecordDisplay>> getDisplayRecords() {
-        return displayRecords;
-    }
-
-    public LiveData<FuelSummary> getSummary() {
-        return summary;
-    }
+    // ---------------- Vehicles ----------------
 
     // -----------------------------
     // Vehicles
@@ -89,6 +64,11 @@ public class FuelViewModel extends AndroidViewModel {
 
     public void deleteFuelRecordById(long id) {
         repository.deleteFuelRecordById(id);
+    }
+
+    // For Main/Home summary
+    public LiveData<List<FuelRecord>> getRecordsByVehicleMileageAsc(long vehicleId) {
+        return repository.getRecordsByVehicleMileageAsc(vehicleId);
     }
 
     public LiveData<List<FuelRecord>> getAllRecordsOrderByVehicleMileageAsc() {

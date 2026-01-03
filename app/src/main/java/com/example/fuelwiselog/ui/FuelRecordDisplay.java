@@ -42,11 +42,11 @@ public class FuelRecordDisplay {
             Double rmPerKm = null;
 
             if (prev != null) {
-                long d = r.getOdometerKm() - prev.getOdometerKm();
+                double d = r.getMileageKm() - prev.getMileageKm();
                 if (d > 0) {
-                    distance = d;
-                    lPer100 = (r.getLiters() / (double) d) * 100.0;
-                    rmPerKm = (r.getCostRm() / (double) d);
+                    distance = Math.round(d);
+                    lPer100 = (r.getVolumeLiters() / d) * 100.0;
+                    rmPerKm = (r.getCostRm() / d);
                 }
             }
 
