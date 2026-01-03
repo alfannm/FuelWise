@@ -8,6 +8,7 @@ import java.util.List;
 @Dao
 public interface VehicleDao {
 
+    // Sorted list for stable display ordering.
     @Query("SELECT * FROM vehicles ORDER BY name COLLATE NOCASE")
     LiveData<List<Vehicle>> getAll();
 

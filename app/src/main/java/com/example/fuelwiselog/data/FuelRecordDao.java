@@ -14,6 +14,7 @@ public interface FuelRecordDao {
     @Delete
     void delete(FuelRecord record);
 
+    // Records for a single vehicle ordered by mileage for efficiency math.
     @Query("SELECT * FROM fuel_records WHERE vehicleId = :vehicleId ORDER BY mileageKm ASC")
     LiveData<List<FuelRecord>> getByVehicleMileageAsc(long vehicleId);
 

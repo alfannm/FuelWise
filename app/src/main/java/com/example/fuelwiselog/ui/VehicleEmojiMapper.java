@@ -6,12 +6,14 @@ final class VehicleEmojiMapper {
 
     private VehicleEmojiMapper() {}
 
+    // Map vehicle type strings to emoji-like symbols for UI badges.
     static String getEmoji(String type) {
         if (type == null) {
             return "🛞";
         }
 
         String t = type.trim().toLowerCase(Locale.ROOT);
+        // Order matters; check more specific keywords first.
         if (t.contains("motor")) {
             return "🏍️";
         }

@@ -23,8 +23,10 @@ public class FuelViewModel extends AndroidViewModel {
 
     public FuelViewModel(@NonNull Application application) {
         super(application);
+        // Repository owns all data operations.
         repository = new FuelRepository(application);
 
+        // Cache LiveData streams used by UI screens.
         vehicles = repository.getVehicles();
         allRecordsOrderByVehicleMileageAsc = repository.getAllRecordsOrderByVehicleMileageAsc();
     }
@@ -54,6 +56,7 @@ public class FuelViewModel extends AndroidViewModel {
     // Records (new correct insert)
     // -----------------------------
     public void insertFuelRecord(long vehicleId, String dateIso, double volumeLiters, double costRm, double mileageKm) {
+        // Create a record object for persistence.
         FuelRecord record = new FuelRecord(vehicleId, dateIso, volumeLiters, costRm, mileageKm);
         repository.insert(record);
     }
@@ -68,6 +71,7 @@ public class FuelViewModel extends AndroidViewModel {
 
     // For Main/Home summary
     public LiveData<List<FuelRecord>> getRecordsByVehicleMileageAsc(long vehicleId) {
+        // Used by dashboard summaries and efficiency calculations.
         return repository.getRecordsByVehicleMileageAsc(vehicleId);
     }
 
@@ -77,6 +81,7 @@ public class FuelViewModel extends AndroidViewModel {
 
     // For AddRecord validation (per vehicle)
     public LiveData<Double> getLastMileage(long vehicleId) {
+        // Used for AddRecord validation.
         return repository.getLastMileage(vehicleId);
     }
 }

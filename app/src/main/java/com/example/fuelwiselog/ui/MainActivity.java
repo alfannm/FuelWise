@@ -42,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
 
         vm = new ViewModelProvider(this).get(FuelViewModel.class);
 
+        // Theme selector is managed via a dropdown adapter.
         setupThemeDropdown();
 
+        // Quick actions to navigate to other screens.
         binding.cardManageVehicles.setOnClickListener(v ->
                 startActivity(new Intent(this, VehicleManagerActivity.class)));
 
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, FuelLogActivity.class)));
 
         vm.getVehicles().observe(this, vehicles -> {
-            // Ensure we have a selected vehicle if any exist
+            // Ensure we have a selected vehicle if any exist.
             selectedVehicleId = Prefs.getSelectedVehicleId(this);
             if (vehicles != null && !vehicles.isEmpty()) {
                 boolean exists = false;
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupThemeDropdown() {
+        // Custom adapter disables filtering and uses fixed theme list.
         String[] themes = getResources().getStringArray(R.array.themes);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.list_item, themes) {
             @Override
@@ -107,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         };
         binding.actTheme.setAdapter(adapter);
 
+        // Pick initial selection from preferences.
         int mode = Prefs.getNightMode(this);
         int initialIndex = 2; // System default
         if (mode == AppCompatDelegate.MODE_NIGHT_NO) {
@@ -117,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         binding.actTheme.setText(themes[initialIndex], false);
 
         binding.actTheme.setOnItemClickListener((parent, view, position, id) -> {
+            // Apply the selected theme mode.
             binding.actTheme.setText(themes[position], false);
             binding.actTheme.dismissDropDown();
             binding.actTheme.clearFocus();
@@ -131,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateActionEnabledState() {
+        // Disable actions when no vehicle is available.
         boolean hasVehicle = selectedVehicleId >= 0;
 
         binding.cardAddRecord.setEnabled(hasVehicle);
@@ -141,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void renderSelectedVehicleCard(List<Vehicle> vehicles) {
+        // Resolve the selected vehicle from the list.
         Vehicle sel = null;
         if (vehicles != null) {
             for (Vehicle v : vehicles) {
@@ -152,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (sel == null) {
+            // Show empty state if selection is missing.
             binding.cardNoVehicle.setVisibility(View.VISIBLE);
             binding.cardCurrentVehicle.setVisibility(View.GONE);
             binding.cardSummary.setVisibility(View.GONE);
@@ -161,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
         binding.cardNoVehicle.setVisibility(View.GONE);
         binding.cardCurrentVehicle.setVisibility(View.VISIBLE);
 
+        // Bind selected vehicle details.
         binding.tvVehicleName.setText(sel.getName());
         binding.tvVehicleType.setText(sel.getType());
         binding.tvCurrentVehicleIcon.setText(VehicleEmojiMapper.getEmoji(sel.getType()));
@@ -172,11 +181,13 @@ public class MainActivity extends AppCompatActivity {
     private void observeSelectedVehicleRecords() {
         if (selectedVehicleId < 0) return;
 
+        // Swap observers when selection changes.
         if (recordsLiveData != null) {
             recordsLiveData.removeObservers(this);
         }
         recordsLiveData = vm.getRecordsByVehicleMileageAsc(selectedVehicleId);
         recordsLiveData.observe(this, records -> {
+            // Update summary and record count.
             int count = records == null ? 0 : records.size();
             binding.tvRecordCount.setText(String.valueOf(count));
 
@@ -196,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
     private HomeSummary computeSummary(List<FuelRecord> records) {
         if (records == null || records.size() < 2) return null;
 
-        // records are already mileage ASC from DAO
+        // Records are already mileage ASC from DAO.
         double firstMileage = records.get(0).getMileageKm();
         double lastMileage = records.get(records.size() - 1).getMileageKm();
         double totalDistance = lastMileage - firstMileage;

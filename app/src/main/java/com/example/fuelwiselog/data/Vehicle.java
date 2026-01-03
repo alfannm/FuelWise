@@ -11,15 +11,19 @@ public class Vehicle {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
+    // Display name shown throughout the UI.
     @NonNull
     private String name;
 
+    // Vehicle type used for emoji and filters.
     @NonNull
     private String type;
 
+    // Hex color used for UI badges.
     @NonNull
     private String colorHex; // e.g. "#B4A7D6"
 
+    // Optional license plate.
     @Nullable
     private String plateNumber;
 

@@ -23,11 +23,13 @@ public class FuelRecord {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
+    // Foreign key to vehicles.id.
     private long vehicleId;
 
     // ISO date "yyyy-MM-dd" so ordering works lexicographically
     private String dateIso;
 
+    // Record measurements captured at fill-up time.
     private double volumeLiters;
     private double costRm;
     private double mileageKm;

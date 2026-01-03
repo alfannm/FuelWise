@@ -41,11 +41,12 @@ public class AddRecordActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
 
-        // Date default = today
+        // Seed the date input with today's date.
         Calendar cal = Calendar.getInstance();
         binding.etDate.setText(iso.format(cal.getTime()));
 
         binding.etDate.setOnClickListener(v -> {
+            // Allow picking a date up to today only.
             Calendar c = Calendar.getInstance();
             DatePickerDialog picker = new DatePickerDialog(
                     AddRecordActivity.this,
@@ -65,12 +66,14 @@ public class AddRecordActivity extends AppCompatActivity {
         viewModel.getVehicles().observe(this, list -> {
             vehicles = list;
 
+            // Without vehicles, this screen cannot proceed.
             if (vehicles.isEmpty()) {
                 Toast.makeText(this, "No vehicles. Add a vehicle first.", Toast.LENGTH_LONG).show();
                 finish();
                 return;
             }
 
+            // Build the dropdown and select a default vehicle.
             setupVehicleDropdown();
 
             long prefId = Prefs.getSelectedVehicleId(this);
@@ -85,6 +88,7 @@ public class AddRecordActivity extends AppCompatActivity {
     }
 
     private void setupVehicleDropdown() {
+        // Map vehicles into readable dropdown labels.
         List<String> labels = new ArrayList<>();
         for (Vehicle v : vehicles) labels.add(v.getName() + " (" + v.getType() + ")");
 
@@ -100,6 +104,7 @@ public class AddRecordActivity extends AppCompatActivity {
     private void setSelectedVehicle(long vehicleId) {
         selectedVehicleId = vehicleId;
 
+        // Find the selected vehicle to populate the preview.
         Vehicle v = null;
         for (Vehicle vv : vehicles) if (vv.getId() == vehicleId) { v = vv; break; }
 
@@ -116,7 +121,7 @@ public class AddRecordActivity extends AppCompatActivity {
             binding.actVehicle.setText(v.getName() + " (" + v.getType() + ")", false);
         }
 
-        // load last mileage for this vehicle
+        // Load last mileage to validate the current entry.
         viewModel.getLastMileage(vehicleId).observe(this, last -> {
             if (last == null) {
                 lastMileage = -1;
@@ -131,6 +136,7 @@ public class AddRecordActivity extends AppCompatActivity {
     private void saveRecord() {
         clearErrors();
 
+        // Read values and validate user input.
         String dateIso = binding.etDate.getText() == null ? "" : binding.etDate.getText().toString().trim();
         Double liters = parseDouble(binding.etLiters.getText());
         Double cost = parseDouble(binding.etCost.getText());
@@ -167,10 +173,10 @@ public class AddRecordActivity extends AppCompatActivity {
 
         if (!ok) return;
 
-        // Save selected vehicle for Home / Fuel Log
+        // Persist selected vehicle for other screens.
         Prefs.setSelectedVehicleId(this, selectedVehicleId);
 
-        // Insert
+        // Insert record after validation passes.
         viewModel.insertFuelRecord(selectedVehicleId, dateIso, liters, cost, mileage);
 
         Toast.makeText(this, "Record added", Toast.LENGTH_SHORT).show();

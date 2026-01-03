@@ -44,6 +44,7 @@ public class FuelLogActivity extends AppCompatActivity {
         binding.btnBack.setOnClickListener(v -> finish());
 
         adapter = new FuelLogAdapter(recordId -> {
+            // Confirm record deletion before removing.
             new AlertDialog.Builder(FuelLogActivity.this)
                     .setTitle("Delete record?")
                     .setMessage("Delete this fuel record?")
@@ -56,18 +57,21 @@ public class FuelLogActivity extends AppCompatActivity {
         binding.rvRecords.setAdapter(adapter);
 
         viewModel.getVehicles().observe(this, list -> {
+            // Vehicles drive filter labels and display metadata.
             vehicles = list;
             setupFilterDropdown();
             recomputeUi();
         });
 
         viewModel.getAllRecordsOrderByVehicleMileageAsc().observe(this, list -> {
+            // Mileage-ordered records are used for efficiency math.
             recordsMileageOrdered = list;
             recomputeUi();
         });
     }
 
     private void setupFilterDropdown() {
+        // Build filter list including the "All Vehicles" option.
         List<String> labels = new ArrayList<>();
         labels.add("All Vehicles");
         for (Vehicle v : vehicles) labels.add(v.getName() + " (" + v.getType() + ")");
@@ -80,6 +84,7 @@ public class FuelLogActivity extends AppCompatActivity {
         filterVehicleId = -1;
 
         binding.actFilter.setOnItemClickListener((parent, view, position, id) -> {
+            // Map selection to vehicle id or "all".
             if (position == 0) {
                 filterVehicleId = -1;
             } else {
@@ -93,10 +98,11 @@ public class FuelLogActivity extends AppCompatActivity {
     private void recomputeUi() {
         if (vehicles == null || recordsMileageOrdered == null) return;
 
+        // Map vehicles by id for fast lookup.
         Map<Long, Vehicle> vehicleMap = new HashMap<>();
         for (Vehicle v : vehicles) vehicleMap.put(v.getId(), v);
 
-        // Compute efficiency per record using mileage-ascending list
+        // Compute efficiency per record using mileage-ascending list.
         Map<Long, FuelLogItem> itemByRecordId = new HashMap<>();
 
         FuelRecord prev = null;
@@ -125,6 +131,7 @@ public class FuelLogActivity extends AppCompatActivity {
             item.hasEfficiency = false;
 
             if (prev != null && prevVehicleId == r.getVehicleId()) {
+                // Only compute efficiency when records are consecutive for a vehicle.
                 double distance = r.getMileageKm() - prev.getMileageKm();
                 if (distance > 0) {
                     item.hasEfficiency = true;
@@ -140,7 +147,7 @@ public class FuelLogActivity extends AppCompatActivity {
             prevVehicleId = r.getVehicleId();
         }
 
-        // Build display list (we sort by date desc; ISO date sorts well)
+        // Build display list (we sort by date desc; ISO date sorts well).
         List<FuelLogItem> display = new ArrayList<>(itemByRecordId.values());
         display.sort((a, b) -> {
             String da = a.dateIso == null ? "" : a.dateIso;
@@ -148,7 +155,7 @@ public class FuelLogActivity extends AppCompatActivity {
             return db.compareTo(da); // desc
         });
 
-        // Apply filter
+        // Apply vehicle filter after sorting.
         if (filterVehicleId > 0) {
             List<FuelLogItem> filtered = new ArrayList<>();
             for (FuelLogItem i : display) if (i.vehicleId == filterVehicleId) filtered.add(i);
@@ -160,8 +167,7 @@ public class FuelLogActivity extends AppCompatActivity {
         binding.tvCount.setText(display.size() + " record" + (display.size() == 1 ? "" : "s"));
         binding.layoutEmpty.setVisibility(display.isEmpty() ? android.view.View.VISIBLE : android.view.View.GONE);
 
-        // Average efficiency card like Figma:
-        // - If filter = All, use selected vehicle
+        // Average efficiency card: if "All", fall back to selected vehicle.
         long avgVehicleId = (filterVehicleId == -1) ? Prefs.getSelectedVehicleId(this) : filterVehicleId;
         updateAverageCard(avgVehicleId);
     }
@@ -172,7 +178,7 @@ public class FuelLogActivity extends AppCompatActivity {
             return;
         }
 
-        // compute averages from mileage-ordered list for that vehicle
+        // Compute averages from mileage-ordered list for that vehicle.
         List<FuelRecord> list = new ArrayList<>();
         for (FuelRecord r : recordsMileageOrdered) if (r.getVehicleId() == vehicleId) list.add(r);
 
@@ -189,6 +195,7 @@ public class FuelLogActivity extends AppCompatActivity {
             FuelRecord cur = list.get(i);
             FuelRecord prev = list.get(i - 1);
 
+            // Skip invalid or non-increasing mileage.
             double dist = cur.getMileageKm() - prev.getMileageKm();
             if (dist <= 0) continue;
 

@@ -53,6 +53,7 @@ public class FuelLogAdapter extends ListAdapter<FuelLogItem, FuelLogAdapter.VH> 
         }
 
         void bind(FuelLogItem item) {
+            // Populate header details for the record row.
             b.tvVehicleName.setText(item.vehicleName == null ? "Vehicle" : item.vehicleName);
             b.tvDate.setText(item.dateIso == null ? "" : item.dateIso);
             b.tvVehicleIcon.setText(VehicleEmojiMapper.getEmoji(item.vehicleType));
@@ -61,13 +62,16 @@ public class FuelLogAdapter extends ListAdapter<FuelLogItem, FuelLogAdapter.VH> 
                 b.cardColor.setCardBackgroundColor(Color.parseColor(item.vehicleColorHex));
             } catch (Exception ignored) {}
 
+            // Format and show stats.
             b.tvVolume.setText(df2.format(item.liters) + "L");
             b.tvCost.setText("RM" + df2.format(item.costRm));
             b.tvMileage.setText(df0.format(item.mileageKm) + "km");
 
+            // Delegate delete action to the host screen.
             b.btnDelete.setOnClickListener(v -> actions.onDelete(item.recordId));
 
             if (item.hasEfficiency) {
+                // Show efficiency block when enough data exists.
                 b.layoutEfficiency.setVisibility(android.view.View.VISIBLE);
                 b.tvNoEfficiency.setVisibility(android.view.View.GONE);
 
@@ -75,12 +79,14 @@ public class FuelLogAdapter extends ListAdapter<FuelLogItem, FuelLogAdapter.VH> 
                 b.tvRmPerKm.setText("RM " + df2.format(item.rmPerKm));
                 b.tvLPer100.setText(df2.format(item.litersPer100Km) + " L");
             } else {
+                // Hide efficiency block for first or incomplete records.
                 b.layoutEfficiency.setVisibility(android.view.View.GONE);
                 b.tvNoEfficiency.setVisibility(android.view.View.VISIBLE);
             }
         }
     }
 
+    // DiffUtil keeps list updates efficient and animated.
     private static final DiffUtil.ItemCallback<FuelLogItem> DIFF = new DiffUtil.ItemCallback<FuelLogItem>() {
         @Override
         public boolean areItemsTheSame(@NonNull FuelLogItem oldItem, @NonNull FuelLogItem newItem) {

@@ -15,11 +15,13 @@ public abstract class FuelDatabase extends RoomDatabase {
     public abstract VehicleDao vehicleDao();
     public abstract FuelRecordDao fuelRecordDao();
 
+    // Single-threaded executor keeps DB writes serialized.
     public static final ExecutorService DB_EXECUTOR = Executors.newSingleThreadExecutor();
 
     private static volatile FuelDatabase INSTANCE;
 
     public static FuelDatabase getInstance(Context context) {
+        // Double-checked locking to build a single DB instance.
         if (INSTANCE == null) {
             synchronized (FuelDatabase.class) {
                 if (INSTANCE == null) {

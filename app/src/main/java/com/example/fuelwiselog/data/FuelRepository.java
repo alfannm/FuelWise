@@ -16,6 +16,7 @@ public class FuelRepository {
     private final FuelRecordDao fuelRecordDao;
 
     public FuelRepository(Application app) {
+        // Repository owns DAO references and write thread.
         FuelDatabase db = FuelDatabase.getInstance(app);
         vehicleDao = db.vehicleDao();
         fuelRecordDao = db.fuelRecordDao();
@@ -27,27 +28,33 @@ public class FuelRepository {
     }
 
     public void insertVehicle(Vehicle v) {
+        // Writes are executed on the DB executor.
         FuelDatabase.DB_EXECUTOR.execute(() -> vehicleDao.insert(v));
     }
 
     public void updateVehicle(Vehicle v) {
+        // Writes are executed on the DB executor.
         FuelDatabase.DB_EXECUTOR.execute(() -> vehicleDao.update(v));
     }
 
     public void deleteVehicle(Vehicle v) {
+        // Writes are executed on the DB executor.
         FuelDatabase.DB_EXECUTOR.execute(() -> vehicleDao.delete(v));
     }
 
     // ---------------- Fuel Records ----------------
     public LiveData<List<FuelRecord>> getRecordsByVehicleMileageAsc(long vehicleId) {
+        // LiveData stream for a vehicle's records ordered by mileage.
         return fuelRecordDao.getByVehicleMileageAsc(vehicleId);
     }
 
     public LiveData<Double> getLastMileage(long vehicleId) {
+        // Latest mileage for validation in AddRecord.
         return fuelRecordDao.getLastMileage(vehicleId);
     }
 
     public LiveData<List<FuelRecord>> getAllRecordsOrderByVehicleMileageAsc() {
+        // All records ordered by vehicle + mileage for efficiency math.
         return fuelRecordDao.getAllOrderByVehicleAndMileageAsc();
     }
 
@@ -62,6 +69,7 @@ public class FuelRepository {
     }
 
     public void deleteFuelRecordById(long id) {
+        // Used by log screen for quick deletion.
         FuelDatabase.DB_EXECUTOR.execute(() -> fuelRecordDao.deleteById(id));
     }
 }

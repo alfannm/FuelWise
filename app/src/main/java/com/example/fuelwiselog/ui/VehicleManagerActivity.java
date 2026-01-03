@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+// Activity for managing vehicles and the add/edit form.
 public class VehicleManagerActivity extends AppCompatActivity {
 
     private ActivityVehicleManagerBinding binding;
@@ -44,6 +45,7 @@ public class VehicleManagerActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(FuelViewModel.class);
 
+        // Prepare UI widgets and adapters.
         setupTypeDropdown();
         setupColorChips();
         setupRecycler();
@@ -55,10 +57,12 @@ public class VehicleManagerActivity extends AppCompatActivity {
         binding.btnSaveVehicle.setOnClickListener(v -> onSaveVehicle());
 
         viewModel.getVehicles().observe(this, vehicles -> {
+            // Update subtitle and empty state from current list.
             binding.tvSubtitle.setText(vehicles.size() + " vehicle" + (vehicles.size() == 1 ? "" : "s"));
 
             binding.layoutEmpty.setVisibility(vehicles.isEmpty() ? android.view.View.VISIBLE : android.view.View.GONE);
 
+            // Sync list and current selection.
             adapter.submitList(new ArrayList<>(vehicles));
             adapter.setSelectedVehicleId(Prefs.getSelectedVehicleId(this));
         });
@@ -69,12 +73,14 @@ public class VehicleManagerActivity extends AppCompatActivity {
             @Override public void onEdit(Vehicle v) { startEdit(v); }
 
             @Override public void onSelect(Vehicle v) {
+                // Persist selection and update adapter state.
                 Prefs.setSelectedVehicleId(VehicleManagerActivity.this, v.getId());
                 adapter.setSelectedVehicleId(v.getId());
                 Toast.makeText(VehicleManagerActivity.this, "Selected: " + v.getName(), Toast.LENGTH_SHORT).show();
             }
 
             @Override public void onDelete(Vehicle v) {
+                // Confirm before deleting a vehicle and its records.
                 new AlertDialog.Builder(VehicleManagerActivity.this)
                         .setTitle("Delete vehicle?")
                         .setMessage("Delete " + v.getName() + "?\nAll related fuel records will also be deleted.")
@@ -89,12 +95,14 @@ public class VehicleManagerActivity extends AppCompatActivity {
     }
 
     private void setupTypeDropdown() {
+        // Populate vehicle type dropdown.
         ArrayAdapter<String> a = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, vehicleTypes);
         binding.actType.setAdapter(a);
         binding.actType.setText(vehicleTypes.get(0), false);
     }
 
     private void setupColorChips() {
+        // Build selectable color chips for vehicle color.
         binding.chipGroupColors.removeAllViews();
         for (int i = 0; i < vehicleColors.size(); i++) {
             String hex = vehicleColors.get(i);
@@ -134,11 +142,13 @@ public class VehicleManagerActivity extends AppCompatActivity {
 
             binding.chipGroupColors.addView(chip);
 
+            // Default to the first color.
             if (i == 0) binding.chipGroupColors.check(chip.getId());
         }
     }
 
     private void toggleForm() {
+        // Toggle between showing and hiding the add/edit form.
         if (binding.layoutForm.getVisibility() == android.view.View.VISIBLE) {
             hideForm();
         } else {
@@ -148,6 +158,7 @@ public class VehicleManagerActivity extends AppCompatActivity {
 
     private void startAdd() {
         editing = null;
+        // Reset form for creating a new vehicle.
         binding.tvFormTitle.setText("Add New Vehicle");
         binding.btnSaveVehicle.setText("Add Vehicle");
         binding.layoutForm.setVisibility(android.view.View.VISIBLE);
@@ -160,6 +171,7 @@ public class VehicleManagerActivity extends AppCompatActivity {
 
     private void startEdit(Vehicle v) {
         editing = v;
+        // Populate form for editing.
         binding.tvFormTitle.setText("Edit Vehicle");
         binding.btnSaveVehicle.setText("Update Vehicle");
         binding.layoutForm.setVisibility(android.view.View.VISIBLE);
@@ -168,7 +180,7 @@ public class VehicleManagerActivity extends AppCompatActivity {
         binding.etPlate.setText(v.getPlateNumber() == null ? "" : v.getPlateNumber());
         binding.actType.setText(v.getType(), false);
 
-        // select color
+        // Select the current vehicle color in the chip group.
         for (int i = 0; i < binding.chipGroupColors.getChildCount(); i++) {
             Chip c = (Chip) binding.chipGroupColors.getChildAt(i);
             String target = vehicleColors.get(i);
@@ -180,11 +192,13 @@ public class VehicleManagerActivity extends AppCompatActivity {
     }
 
     private void hideForm() {
+        // Hide form and clear edit state.
         binding.layoutForm.setVisibility(android.view.View.GONE);
         editing = null;
     }
 
     private void onSaveVehicle() {
+        // Read user input from the form.
         String name = binding.etName.getText() == null ? "" : binding.etName.getText().toString().trim();
         String plate = binding.etPlate.getText() == null ? "" : binding.etPlate.getText().toString().trim().toUpperCase();
         String type = binding.actType.getText() == null ? vehicleTypes.get(0) : binding.actType.getText().toString();
@@ -200,10 +214,12 @@ public class VehicleManagerActivity extends AppCompatActivity {
         String colorHex = checkedIndex >= 0 && checkedIndex < vehicleColors.size() ? vehicleColors.get(checkedIndex) : vehicleColors.get(0);
 
         if (editing == null) {
+            // Insert a new vehicle.
             Vehicle v = new Vehicle(name, type, colorHex, plate.isEmpty() ? null : plate);
             viewModel.insertVehicle(v);
             Toast.makeText(this, "Vehicle added", Toast.LENGTH_SHORT).show();
         } else {
+            // Update existing vehicle.
             editing.setName(name);
             editing.setType(type);
             editing.setPlateNumber(plate.isEmpty() ? null : plate);
@@ -216,11 +232,13 @@ public class VehicleManagerActivity extends AppCompatActivity {
     }
 
     private Chip findCheckedChip() {
+        // Resolve the currently selected color chip.
         int id = binding.chipGroupColors.getCheckedChipId();
         return binding.chipGroupColors.findViewById(id);
     }
 
     private int dpToPx(int dp) {
+        // Convert dp to pixels using current display density.
         return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 }
