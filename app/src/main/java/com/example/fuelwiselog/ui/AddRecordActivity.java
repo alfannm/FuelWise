@@ -17,6 +17,7 @@ import com.example.fuelwiselog.databinding.ActivityAddRecordBinding;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class AddRecordActivity extends AppCompatActivity {
@@ -46,7 +47,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
         binding.etDate.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
-            new DatePickerDialog(
+            DatePickerDialog picker = new DatePickerDialog(
                     AddRecordActivity.this,
                     (view, year, month, dayOfMonth) -> {
                         Calendar picked = Calendar.getInstance();
@@ -56,7 +57,9 @@ public class AddRecordActivity extends AppCompatActivity {
                     c.get(Calendar.YEAR),
                     c.get(Calendar.MONTH),
                     c.get(Calendar.DAY_OF_MONTH)
-            ).show();
+            );
+            picker.getDatePicker().setMaxDate(System.currentTimeMillis());
+            picker.show();
         });
 
         viewModel.getVehicles().observe(this, list -> {
@@ -142,6 +145,9 @@ public class AddRecordActivity extends AppCompatActivity {
         if (dateIso.isEmpty()) {
             binding.tilDate.setError("Pick a date");
             ok = false;
+        } else if (isFutureDate(dateIso)) {
+            binding.tilDate.setError("Date cannot be in the future");
+            ok = false;
         }
         if (liters == null || liters <= 0) {
             binding.tilLiters.setError("Invalid liters");
@@ -177,6 +183,22 @@ public class AddRecordActivity extends AppCompatActivity {
         binding.tilLiters.setError(null);
         binding.tilCost.setError(null);
         binding.tilMileage.setError(null);
+    }
+
+    private boolean isFutureDate(String dateIso) {
+        try {
+            iso.setLenient(false);
+            Date picked = iso.parse(dateIso);
+            if (picked == null) return true;
+            Calendar today = Calendar.getInstance();
+            today.set(Calendar.HOUR_OF_DAY, 0);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+            today.set(Calendar.MILLISECOND, 0);
+            return picked.after(today.getTime());
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     private Double parseDouble(CharSequence cs) {
