@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -85,7 +86,25 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupThemeDropdown() {
         String[] themes = getResources().getStringArray(R.array.themes);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item, themes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.list_item, themes) {
+            @Override
+            public Filter getFilter() {
+                return new Filter() {
+                    @Override
+                    protected FilterResults performFiltering(CharSequence constraint) {
+                        FilterResults results = new FilterResults();
+                        results.values = themes;
+                        results.count = themes.length;
+                        return results;
+                    }
+
+                    @Override
+                    protected void publishResults(CharSequence constraint, FilterResults results) {
+                        notifyDataSetChanged();
+                    }
+                };
+            }
+        };
         binding.actTheme.setAdapter(adapter);
 
         int mode = Prefs.getNightMode(this);
@@ -98,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
         binding.actTheme.setText(themes[initialIndex], false);
 
         binding.actTheme.setOnItemClickListener((parent, view, position, id) -> {
+            binding.actTheme.setText(themes[position], false);
+            binding.actTheme.dismissDropDown();
             binding.actTheme.clearFocus();
             int newMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
             if (position == 0) {
