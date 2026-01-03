@@ -103,8 +103,8 @@
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp"
                     app:cardBackgroundColor="#B4A7D6">
-
                     <TextView
+                        android:id="@+id/tvCurrentVehicleIcon"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
@@ -431,6 +431,8 @@
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
+
+
 
 
 

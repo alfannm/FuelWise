@@ -163,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding.tvVehicleName.setText(sel.getName());
         binding.tvVehicleType.setText(sel.getType());
+        binding.tvCurrentVehicleIcon.setText(VehicleEmojiMapper.getEmoji(sel.getType()));
         try {
             binding.cardVehicleColor.setCardBackgroundColor(Color.parseColor(sel.getColorHex()));
         } catch (Exception ignored) {}

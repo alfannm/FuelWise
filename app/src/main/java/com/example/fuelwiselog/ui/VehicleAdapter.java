@@ -60,6 +60,7 @@ public class VehicleAdapter extends ListAdapter<Vehicle, VehicleAdapter.VH> {
         void bind(Vehicle v) {
             b.tvName.setText(v.getName());
             b.tvType.setText(v.getType());
+            b.tvVehicleIcon.setText(VehicleEmojiMapper.getEmoji(v.getType()));
 
             if (v.getPlateNumber() != null && !v.getPlateNumber().trim().isEmpty()) {
                 b.tvPlate.setVisibility(android.view.View.VISIBLE);

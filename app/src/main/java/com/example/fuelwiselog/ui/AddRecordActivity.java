@@ -104,6 +104,7 @@ public class AddRecordActivity extends AppCompatActivity {
             binding.layoutVehiclePreview.setVisibility(android.view.View.VISIBLE);
             binding.tvPreviewName.setText(v.getName());
             binding.tvPreviewType.setText(v.getType());
+            binding.tvPreviewVehicleIcon.setText(VehicleEmojiMapper.getEmoji(v.getType()));
             try {
                 binding.cardPreviewColor.setCardBackgroundColor(Color.parseColor(v.getColorHex()));
             } catch (Exception ignored) {}

@@ -25,12 +25,12 @@
                 android:layout_height="40dp"
                 app:cardCornerRadius="12dp"
                 android:layout_marginEnd="10dp">
-
                 <TextView
+                    android:id="@+id/tvVehicleIcon"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="⛽"
+                    android:text="🚗"
                     android:textSize="16sp"/>
             </com.google.android.material.card.MaterialCardView>
 
@@ -245,3 +245,5 @@
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+
+

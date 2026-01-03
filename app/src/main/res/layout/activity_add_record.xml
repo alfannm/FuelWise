@@ -92,13 +92,13 @@
                         android:layout_height="40dp"
                         app:cardCornerRadius="12dp">
 
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            app:srcCompat="@drawable/ic_vehicle_24"
-                            app:tint="@color/text_primary"/>
+                        <TextView
+                            android:id="@+id/tvPreviewVehicleIcon"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="🚗"
+                            android:textSize="16sp"/>
                     </com.google.android.material.card.MaterialCardView>
 
                     <LinearLayout

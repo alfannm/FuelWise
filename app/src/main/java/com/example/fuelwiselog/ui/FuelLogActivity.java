@@ -115,9 +115,11 @@ public class FuelLogActivity extends AppCompatActivity {
             if (v != null) {
                 item.vehicleName = v.getName();
                 item.vehicleColorHex = v.getColorHex();
+                item.vehicleType = v.getType();
             } else {
                 item.vehicleName = "Vehicle";
                 item.vehicleColorHex = "#B4A7D6";
+                item.vehicleType = "Other";
             }
 
             item.hasEfficiency = false;

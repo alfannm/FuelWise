@@ -23,8 +23,8 @@
             app:cardCornerRadius="14dp"
             app:cardElevation="4dp"
             android:layout_marginEnd="12dp">
-
             <TextView
+                android:id="@+id/tvVehicleIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
@@ -130,4 +130,6 @@
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
+
+
 

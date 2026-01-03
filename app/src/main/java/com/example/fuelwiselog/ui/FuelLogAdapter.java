@@ -55,6 +55,7 @@ public class FuelLogAdapter extends ListAdapter<FuelLogItem, FuelLogAdapter.VH> 
         void bind(FuelLogItem item) {
             b.tvVehicleName.setText(item.vehicleName == null ? "Vehicle" : item.vehicleName);
             b.tvDate.setText(item.dateIso == null ? "" : item.dateIso);
+            b.tvVehicleIcon.setText(VehicleEmojiMapper.getEmoji(item.vehicleType));
 
             try {
                 b.cardColor.setCardBackgroundColor(Color.parseColor(item.vehicleColorHex));
@@ -91,6 +92,7 @@ public class FuelLogAdapter extends ListAdapter<FuelLogItem, FuelLogAdapter.VH> 
             return o.vehicleId == n.vehicleId
                     && safeEq(o.vehicleName, n.vehicleName)
                     && safeEq(o.vehicleColorHex, n.vehicleColorHex)
+                    && safeEq(o.vehicleType, n.vehicleType)
                     && safeEq(o.dateIso, n.dateIso)
                     && o.liters == n.liters
                     && o.costRm == n.costRm

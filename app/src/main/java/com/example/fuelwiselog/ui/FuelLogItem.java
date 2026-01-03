@@ -5,6 +5,7 @@ public class FuelLogItem {
     public long vehicleId;
     public String vehicleName;
     public String vehicleColorHex;
+    public String vehicleType;
 
     public String dateIso;
     public double liters;
